@@ -13,11 +13,9 @@ namespace WorldSimulator.Service
         {
             God = new Human("God", GenderType.Male, "Heaven", true);
             Human.Population--;
-
         }
         public static void CreateAdamAndEve()
         {
-
             Adam = new Human("Adam", GenderType.Male, "Garden of Eden", true);
             Adam.Age = 33;
 
@@ -41,7 +39,6 @@ namespace WorldSimulator.Service
 
             Console.WriteLine("All children have been born!");
         }
-
 
         public static void SeeAllHumans()
         {
@@ -76,7 +73,6 @@ namespace WorldSimulator.Service
 
             Console.WriteLine("How many children dose Eve and Adam have ");
             Console.WriteLine($"{childrenList.Count} children");
-
         }
 
         public static void OldestHuman()
@@ -101,12 +97,8 @@ namespace WorldSimulator.Service
         }
         public static void Die(Human h)
         {
-
             h.Die();
             Society.Remove(h);
-            //Console.WriteLine($"{h.Name} has died");
-            //Console.WriteLine(Human.Population);
-
         }
 
         public static void SortByAge()
@@ -127,7 +119,6 @@ namespace WorldSimulator.Service
             string[] homeLocations = { "Garden of Eden", "Mystic Valley", "Crystal Lake", "Emerald Forest", "Golden Plains" };
 
             GenderType gender = (GenderType)random.Next(0, 2);
-
 
             string name = (gender == GenderType.Male)
                 ? maleNames[random.Next(maleNames.Length)]
