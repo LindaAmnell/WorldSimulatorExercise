@@ -10,7 +10,6 @@
             {
                 Console.WriteLine("Creating the world...");
 
-
                 HumanHelper.CreateGod();
                 HumanHelper.CreateAdamAndEve();
 
@@ -26,21 +25,11 @@
                 Console.WriteLine("\n=========================================");
 
                 HumanHelper.SeeAllHumans();
-
                 Console.WriteLine("\n=========================================");
 
                 Console.WriteLine("End of creation sequence.");
-
-
-
-
-
             }
         }
     }
-
-
-
-
 }
 
