@@ -132,9 +132,9 @@
             return child;
         }
 
-        public void GetOlder()
+        public void GetOlder(int age)
         {
-            Age++;
+            Age += age;
         }
         public void Die()
         {
@@ -198,6 +198,33 @@
         {
             Console.WriteLine($"{Name} is {Age} years old {Gender}");
             Console.WriteLine($"Has health {Health} and energy level {EnergyLevel} and happiness {Happiness}");
+        }
+
+        public void GoToSchool(string education)
+        {
+            if (!Skills.Contains(education))
+            {
+                Intelligence += 8;
+                Skills.Add(education);
+                return;
+            }
+        }
+
+        public void LearnSkill(string skill)
+        {
+
+            Intelligence += 10;
+            if (!Skills.Contains(skill))
+            {
+                Creativity += 5;
+                Skills.Add(skill);
+                Console.WriteLine($"{Name} learned {skill}");
+                return;
+            }
+            else
+            {
+                Console.WriteLine($"{Name} already knows {skill}");
+            }
         }
 
         public override string ToString()

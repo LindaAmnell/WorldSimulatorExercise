@@ -5,10 +5,10 @@ namespace WorldSimulator.Service
     public class HumanHelper
     {
         public static List<Human> Society = new List<Human>();
-
         public static Human God { get; private set; }
         public static Human Adam { get; private set; }
         public static Human Eve { get; private set; }
+
         public static void CreateGod()
         {
             God = new Human("God", GenderType.Male, "Heaven", true);
@@ -30,10 +30,13 @@ namespace WorldSimulator.Service
         public static void EvaAndAdamMakeChildren(int number)
         {
             Console.WriteLine($"\nAdam and Eve are having {number} children...");
+            Random random = new Random();
 
             for (int i = 0; i < number; i++)
             {
+                int age = random.Next(5, 15);
                 Human child = Adam.MakeChild(Eve);
+                child.GetOlder(age);
                 Society.Add(child);
             }
 
@@ -84,9 +87,11 @@ namespace WorldSimulator.Service
 
         public static void MakeAllHumansOlder()
         {
+            Random random = new Random();
+            int age = random.Next(5, 10);
             foreach (Human h in Society)
             {
-                h.GetOlder();
+                h.GetOlder(age);
             }
         }
 
@@ -97,6 +102,22 @@ namespace WorldSimulator.Service
         }
         public static void Die(Human h)
         {
+            var children = Society.Where(c => c.Mother.Name == h.Name || c.Father.Name == h.Name);
+
+            if (children.Count() > 0 && h.Wealth > 0)
+            {
+                Console.WriteLine($"{h.Name}'s kids");
+
+                decimal money = h.Wealth / children.Count();
+                foreach (Human f in children)
+                {
+                    f.Wealth += money;
+                    Console.WriteLine($"{f.Name} got {money:f2} from his parent {h.Name}");
+                }
+            }
+
+            h.Wealth = 0;
+            //Console.WriteLine($"{h.Name} dies");
             h.Die();
             Society.Remove(h);
         }
@@ -130,7 +151,7 @@ namespace WorldSimulator.Service
             newHuman.Father = God;
             newHuman.Mother = God;
 
-            newHuman.Age = random.Next(0, 20);
+            newHuman.Age = random.Next(0, 10);
             Society.Add(newHuman);
             Console.WriteLine(newHuman.ToString());
 
@@ -175,7 +196,7 @@ namespace WorldSimulator.Service
         {
             if (Society.Count == 0)
             {
-                Console.WriteLine("No one left to die 😅");
+                Console.WriteLine("No one left to die");
                 return;
             }
 
@@ -184,15 +205,23 @@ namespace WorldSimulator.Service
             Human unlucky = Society[index];
 
             Die(unlucky);
-            Console.WriteLine($"{unlucky.Name}  dies");
+            Console.WriteLine($"{unlucky.Name} died of a disease.");
+
+
         }
 
         public static void RandomMakeChild()
         {
             Random random = new Random();
 
-            var men = Society.Where(h => h.Gender == GenderType.Male).ToList();
-            var female = Society.Where(h => h.Gender == GenderType.Female).ToList();
+            var men = Society.Where(h => h.IsAlive && h.Gender == GenderType.Male && h.Age >= 18).ToList();
+            var female = Society.Where(h => h.Gender == GenderType.Female && h.Age >= 18).ToList();
+
+            if (men.Count == 0 || female.Count == 0)
+            {
+                Console.WriteLine("No adults available to reproduce this year.");
+                return;
+            }
 
             var mother = female[random.Next(female.Count)];
             var father = men[random.Next(men.Count)];
@@ -200,7 +229,7 @@ namespace WorldSimulator.Service
             Human child = father.MakeChild(mother);
 
             Society.Add(child);
-            Console.WriteLine($"{child.Name} was born");
+            Console.WriteLine($"{father.Name} and {mother.Name} had a child named {child.Name}.");
         }
 
         public static void SimulateYear()
@@ -209,11 +238,13 @@ namespace WorldSimulator.Service
 
             int newBirths = random.Next(0, 6);
             int deaths = random.Next(0, 3);
-            int newHumans = random.Next(0, 4);
+            int newHumans = random.Next(0, 6);
+            int randomAge;
 
-            foreach (Human h in Society)
+            foreach (Human h in Society.ToList())
             {
-                h.GetOlder();
+                randomAge = random.Next(5, 10);
+                h.GetOlder(randomAge);
                 h.Health += random.Next(-10, 6);
                 h.Happiness += random.Next(-5, 6);
 
@@ -225,7 +256,14 @@ namespace WorldSimulator.Service
                 {
                     h.Happiness = 0;
                 }
+                if (h.Age >= 110)
+                {
+                    Die(h);
+                    Console.WriteLine($"{h.Name} died of old age");
+                }
             }
+
+
 
             for (int i = 0; i < newHumans; i++)
             {
@@ -244,6 +282,63 @@ namespace WorldSimulator.Service
             }
 
         }
+
+        public static void SimulateGenerations(int population)
+        {
+            Console.WriteLine("\n===== Starting multi-generation simulation =====");
+
+
+            int years = 0;
+            while (Society.Count < population)
+            {
+                years++;
+                Console.WriteLine($"\n--- Year {years} ---");
+
+
+                SimulateYear();
+
+                Console.WriteLine($"Population: {Society.Count}");
+
+                if (Society.Count == 0)
+                {
+                    Console.WriteLine("Everyone has died. Simulation stopped.");
+                    break;
+                }
+            }
+
+            Console.WriteLine("\n===== Simulation complete =====");
+            Console.WriteLine($"Years simulated: {years}");
+            Console.WriteLine($"Final population: {Society.Count}");
+            Console.WriteLine($"Average age: {Society.Average(h => h.Age):F1}");
+        }
+
+
+        public static void HappiestPerson()
+        {
+            Random random = new Random();
+            foreach (Human h in Society)
+            {
+                double happy = random.Next(10, 80);
+                h.Happiness += happy;
+            }
+
+            var happyiest = Society.MaxBy(h => h.Happiness);
+
+            Console.WriteLine($"{happyiest.Name} is the happiest person {happyiest.Happiness}");
+        }
+
+        public static Human FindByName(string name)
+        {
+            var person = Society.FirstOrDefault(h => h.Name == name);
+
+            if (person != null)
+            {
+                return person;
+            }
+
+            return null;
+        }
+
 
     }
 }
